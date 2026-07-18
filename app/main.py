@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from app.services.swapi_client import SWAPIUnavailableError
-# from app.routers import sync, characters, films, starships, votes
+from app.routers import sync, characters, films, starships, votes
 
 app = FastAPI(
     title="Star Wars API",
@@ -33,8 +33,12 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An unexpected internal server error occurred."},
     )
 
-# app.include_router(sync.router, prefix="/api")
-# app.include_router(characters.router, prefix="/api")
-# app.include_router(films.router, prefix="/api")
-# app.include_router(starships.router, prefix="/api")
-# app.include_router(votes.router, prefix="/api")
+@app.get("/health", tags=["health"])
+async def health_check():
+    return {"status": "ok"}
+
+app.include_router(sync.router, prefix="/api")
+app.include_router(characters.router, prefix="/api")
+app.include_router(films.router, prefix="/api")
+app.include_router(starships.router, prefix="/api")
+app.include_router(votes.router, prefix="/api")

@@ -1,6 +1,8 @@
 from app.schemas.schemas import (
-    VoteCreate, VoteResponse,
+    VoteCreate, VoteResponse, VoteCount,
     CharacterBase, CharacterResponse,
     FilmBase, FilmResponse,
-    StarshipBase, StarshipResponse
+    StarshipBase, StarshipResponse,
+    PaginatedCharacters, PaginatedFilms, PaginatedStarships,
+    SyncResult,
 )
