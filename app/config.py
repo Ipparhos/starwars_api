@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     SWAPI_TIMEOUT_SECONDS: int = 10
     
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/starwars"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5433/starwars"
     
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
