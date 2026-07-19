@@ -128,10 +128,13 @@ See `.env.example`. In short: `DATABASE_URL` (Postgres connection string),
 | POST | `/api/sync` | Sync films, starships, and characters from SWAPI |
 | POST | `/api/sync/{films\|starships\|characters}` | Sync one resource type |
 | GET | `/api/characters` | Paginated list of stored characters |
+| GET | `/api/characters/search` | Search characters by name (case-insensitive) |
 | GET | `/api/characters/{id}` | Get one character |
 | GET | `/api/films` | Paginated list of stored films |
+| GET | `/api/films/search` | Search films by title (case-insensitive) |
 | GET | `/api/films/{id}` | Get one film |
 | GET | `/api/starships` | Paginated list of stored starships |
+| GET | `/api/starships/search` | Search starships by name (case-insensitive) |
 | GET | `/api/starships/{id}` | Get one starship |
 | POST | `/api/votes/{type}/{id}` | Cast a vote for a character/film/starship |
 | GET | `/api/votes/{type}/{id}` | Get a resource's vote count |
