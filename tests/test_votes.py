@@ -52,3 +52,24 @@ async def test_cast_vote_not_found(async_client: AsyncClient):
     resp = await async_client.post("/api/votes", json=payload)
     assert resp.status_code == 404
     assert "Character with ID 9999 not found" in resp.json()["detail"]
+
+async def test_get_vote_count(async_client: AsyncClient, db_session: AsyncSession):
+    """Test retrieving vote counts."""
+    char = await seed_data(db_session)
+    
+    # Cast a vote
+    payload = {"resource_type": "character", "resource_id": char.id}
+    await async_client.post("/api/votes", json=payload)
+    await async_client.post("/api/votes", json=payload)
+    
+    # Get count
+    resp = await async_client.get(f"/api/votes/character/{char.id}")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["resource_type"] == "character"
+    assert data["resource_id"] == char.id
+    assert data["count"] == 2
+    
+    # Invalid type
+    resp_invalid = await async_client.get(f"/api/votes/planet/{char.id}")
+    assert resp_invalid.status_code == 422

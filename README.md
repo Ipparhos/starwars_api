@@ -136,7 +136,7 @@ See `.env.example`. In short: `DATABASE_URL` (Postgres connection string),
 | GET | `/api/starships` | Paginated list of stored starships |
 | GET | `/api/starships/search` | Search starships by name (case-insensitive) |
 | GET | `/api/starships/{id}` | Get one starship |
-| POST | `/api/votes/{type}/{id}` | Cast a vote for a character/film/starship |
+| POST | `/api/votes` | Cast a vote for a character/film/starship |
 | GET | `/api/votes/{type}/{id}` | Get a resource's vote count |
 | GET | `/health` | Liveness check |
 
@@ -164,7 +164,7 @@ Coverage includes:
 - `GET` pagination and case-insensitive search queries
 - `POST /api/votes` with proper 404 and validation error paths
 
-**Current Coverage: 80%**
+**Current Coverage: 82%**
 ```text
 Name                           Stmts   Miss  Cover   Missing
 ------------------------------------------------------------
@@ -179,18 +179,18 @@ app/models/film.py                14      0   100%
 app/models/starship.py            13      0   100%
 app/models/vote.py                 9      0   100%
 app/routers/__init__.py            0      0   100%
-app/routers/characters.py         23      6    74%   16, 24, 29-32
-app/routers/films.py              23      7    70%   15-16, 23, 28-31
-app/routers/starships.py          23      7    70%   15-16, 23, 28-31
-app/routers/sync.py               12      1    92%   21
-app/routers/votes.py              23      5    78%   20, 22, 30, 39-41
+app/routers/characters.py         23      5    78%   16, 24, 30-32
+app/routers/films.py              23      5    78%   16, 23, 29-31
+app/routers/starships.py          23      5    78%   16, 23, 29-31
+app/routers/sync.py               30      4    87%   21, 29, 37, 45
+app/routers/votes.py              32      6    81%   28, 44, 46, 54, 63-65
 app/schemas/__init__.py            1      0   100%
-app/schemas/schemas.py            41      0   100%
+app/schemas/schemas.py            45      0   100%
 app/services/__init__.py           2      0   100%
 app/services/swapi_client.py      28      3    89%   28-30
 app/services/sync_service.py      85     38    55%   21, 47, 59-79, 95-113, 136-179, 190-192
 ------------------------------------------------------------
-TOTAL                            364     72    80%
+TOTAL                            395     71    82%
 ```
 
 ## Known Limitations / Roadmap

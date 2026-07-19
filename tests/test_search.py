@@ -53,3 +53,40 @@ async def test_search_case_insensitive(async_client: AsyncClient, db_session: As
     resp3 = await async_client.get("/api/starships/search?name=falcon")
     assert resp3.status_code == 200
     assert len(resp3.json()) == 0
+
+async def test_get_resource_by_id(async_client: AsyncClient, db_session: AsyncSession):
+    """Test getting single resources by ID (happy path and 404)."""
+    await seed_data(db_session)
+    
+    # Characters
+    resp = await async_client.get("/api/characters")
+    char_id = resp.json()[0]["id"]
+    
+    resp_char = await async_client.get(f"/api/characters/{char_id}")
+    assert resp_char.status_code == 200
+    assert resp_char.json()["name"] == "Luke Skywalker"
+    
+    resp_char_404 = await async_client.get("/api/characters/9999")
+    assert resp_char_404.status_code == 404
+
+    # Films
+    resp_f = await async_client.get("/api/films")
+    film_id = resp_f.json()[0]["id"]
+    
+    resp_film = await async_client.get(f"/api/films/{film_id}")
+    assert resp_film.status_code == 200
+    assert resp_film.json()["title"] == "A New Hope"
+    
+    resp_film_404 = await async_client.get("/api/films/9999")
+    assert resp_film_404.status_code == 404
+
+    # Starships
+    resp_s = await async_client.get("/api/starships")
+    ship_id = resp_s.json()[0]["id"]
+    
+    resp_ship = await async_client.get(f"/api/starships/{ship_id}")
+    assert resp_ship.status_code == 200
+    assert resp_ship.json()["name"] == "X-wing"
+    
+    resp_ship_404 = await async_client.get("/api/starships/9999")
+    assert resp_ship_404.status_code == 404
