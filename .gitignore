@@ -5,7 +5,8 @@ env/
 .venv/
 .python-version
 .env.example
- 
+htmlcov/
+.coverage
 __pycache__/
 *.py[cod]
 *$py.class
