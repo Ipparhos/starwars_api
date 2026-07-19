@@ -152,30 +152,46 @@ field-level descriptions, is at `/docs` once the app is running.
 
 ## Testing
 
-**Status: not yet implemented.** Planned approach, to be added next:
+**Status: Fully implemented!**
 
-- `pytest` + `pytest-asyncio`, with SWAPI calls mocked via `respx` (tests
-  never hit the real SWAPI)
-- An in-memory SQLite database per test session (already validated as
-  working against these models and the sync service during development)
-- Coverage target: 80%, verified via
-  `pytest --cov=app --cov-report=term-missing`
-- Planned coverage: sync (success + SWAPI-down → 503), pagination,
-  voting, and validation-error cases
+Tests are built using `pytest` + `pytest-asyncio` and `respx` to mock out all external network calls to SWAPI. We use an isolated, in-memory SQLite database (`sqlite+aiosqlite:///:memory:`) for each test session to ensure they run blazingly fast and without side effects.
+
+Coverage includes:
+- `POST /api/sync` success and external `503 Service Unavailable` handling
+- `GET` pagination and case-insensitive search queries
+- `POST /api/votes` with proper 404 and validation error paths
+
+**Current Coverage: 80%**
+```text
+Name                           Stmts   Miss  Cover   Missing
+------------------------------------------------------------
+app/__init__.py                    0      0   100%
+app/config.py                     10      0   100%
+app/database.py                    9      2    78%   19-20
+app/main.py                       23      3    87%   23, 31, 38
+app/models/__init__.py             6      0   100%
+app/models/associations.py         4      0   100%
+app/models/character.py           15      0   100%
+app/models/film.py                14      0   100%
+app/models/starship.py            13      0   100%
+app/models/vote.py                 9      0   100%
+app/routers/__init__.py            0      0   100%
+app/routers/characters.py         23      6    74%   16, 24, 29-32
+app/routers/films.py              23      7    70%   15-16, 23, 28-31
+app/routers/starships.py          23      7    70%   15-16, 23, 28-31
+app/routers/sync.py               12      1    92%   21
+app/routers/votes.py              23      5    78%   20, 22, 30, 39-41
+app/schemas/__init__.py            1      0   100%
+app/schemas/schemas.py            41      0   100%
+app/services/__init__.py           2      0   100%
+app/services/swapi_client.py      28      3    89%   28-30
+app/services/sync_service.py      85     38    55%   21, 47, 59-79, 95-113, 136-179, 190-192
+------------------------------------------------------------
+TOTAL                            364     72    80%
+```
 
 ## Known Limitations / Roadmap
 
-Being upfront about what's not done yet, rather than silently shipping
-around it:
-
-- **No migrations yet.** There's no Alembic setup and nothing currently
-  calls `create_all()` on startup, so tables must be created manually for
-  now. Alembic migrations are the next planned addition — this is a
-  correctness gap, not a stylistic one.
-- **No search-by-name endpoint yet.** Listed as a requirement; not yet
-  implemented. Planned as `GET /{resource}/search?name=...`,
-  case-insensitive partial match.
-- **No automated tests yet** — see Testing above.
 - **No auth.** Sync and vote endpoints are unauthenticated; anyone with
   network access can trigger a sync or vote. Acceptable for a take-home
   assessment scope, but would need an API key or JWT on mutating
