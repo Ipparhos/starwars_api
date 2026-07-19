@@ -16,6 +16,12 @@ class VoteResponse(BaseModel):
     
     model_config = ConfigDict(from_attributes=True)
 
+class VoteCount(BaseModel):
+    """Response model for vote count."""
+    resource_type: str = Field(..., description="The type of resource.")
+    resource_id: int = Field(..., description="The internal database ID of the resource.")
+    count: int = Field(..., description="The total number of votes for this resource.")
+
 class CharacterBase(BaseModel):
     name: str = Field(..., description="The name of the character.")
     height: Optional[str] = Field(None, description="The height of the character in cm.")

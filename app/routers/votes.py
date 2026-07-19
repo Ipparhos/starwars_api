@@ -1,11 +1,35 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models import Vote, Character, Film, Starship
-from app.schemas.schemas import VoteCreate, VoteResponse
+from app.schemas.schemas import VoteCreate, VoteResponse, VoteCount
 
 router = APIRouter(prefix="/votes", tags=["Votes"])
+
+@router.get("/{resource_type}/{resource_id}", response_model=VoteCount)
+async def get_vote_count(resource_type: str, resource_id: int, db: AsyncSession = Depends(get_db)):
+    """Get the total number of votes for a specific resource."""
+    resource_type = resource_type.lower()
+    
+    if resource_type not in ["character", "film", "starship"]:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, 
+            detail="resource_type must be 'character', 'film', or 'starship'"
+        )
+        
+    query = select(func.count()).select_from(Vote).where(
+        Vote.resource_type == resource_type,
+        Vote.resource_id == resource_id
+    )
+    count = await db.scalar(query)
+    
+    return VoteCount(
+        resource_type=resource_type,
+        resource_id=resource_id,
+        count=count or 0
+    )
 
 @router.post("", response_model=VoteResponse, status_code=status.HTTP_201_CREATED)
 async def cast_vote(vote_in: VoteCreate, db: AsyncSession = Depends(get_db)):
