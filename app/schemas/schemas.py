@@ -2,90 +2,57 @@ from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
 from datetime import datetime
 
-
 class VoteCreate(BaseModel):
-    """Empty on purpose — the resource being voted on is identified entirely
-    by the `resource_type`/`resource_id` path params on POST /votes/{type}/{id},
-    so no request body fields are needed."""
-    pass
-
+    """Payload to cast a vote for a specific resource."""
+    resource_type: str = Field(..., description="The type of resource: 'character', 'film', or 'starship'.")
+    resource_id: int = Field(..., description="The internal database ID of the resource.")
 
 class VoteResponse(BaseModel):
-    id: int = Field(..., description="Internal id of this vote record")
-    resource_type: str = Field(..., description="Type of resource voted on: 'character', 'film', or 'starship'")
-    resource_id: int = Field(..., description="Local (not SWAPI) id of the voted-on resource")
-    created_at: datetime = Field(..., description="Timestamp the vote was cast, in UTC")
-
+    """Response model for a recorded vote."""
+    id: int = Field(..., description="The unique ID of the vote.")
+    resource_type: str = Field(..., description="The type of resource voted for.")
+    resource_id: int = Field(..., description="The internal database ID of the resource voted for.")
+    created_at: datetime = Field(..., description="When the vote was cast.")
+    
     model_config = ConfigDict(from_attributes=True)
-
-
-class VoteCount(BaseModel):
-    resource_type: str = Field(..., description="Type of resource: 'character', 'film', or 'starship'")
-    resource_id: int = Field(..., description="Local id of the resource")
-    vote_count: int = Field(..., description="Total number of votes this resource has received")
-
 
 class CharacterBase(BaseModel):
-    name: str = Field(..., description="Character's full name, as returned by SWAPI")
-    height: Optional[str] = Field(None, description="Height in centimeters (kept as string to match SWAPI, which uses 'unknown' for some records)")
-    mass: Optional[str] = Field(None, description="Mass in kilograms (string, same reasoning as height)")
-    birth_year: Optional[str] = Field(None, description="Birth year in SWAPI's BBY/ABY notation")
-    swapi_id: int = Field(..., description="Numeric id of this resource on SWAPI, extracted from its URL")
-    swapi_url: str = Field(..., description="Canonical SWAPI URL this record was synced from")
-
+    name: str = Field(..., description="The name of the character.")
+    height: Optional[str] = Field(None, description="The height of the character in cm.")
+    mass: Optional[str] = Field(None, description="The mass of the character in kg.")
+    birth_year: Optional[str] = Field(None, description="The birth year of the character (e.g. 19BBY).")
+    swapi_id: int = Field(..., description="The original ID of the character from SWAPI.")
+    swapi_url: str = Field(..., description="The original URL of the character from SWAPI.")
 
 class CharacterResponse(CharacterBase):
-    id: int = Field(..., description="Local database id — use this for votes and lookups against this API")
-
+    """Response model for a Star Wars character."""
+    id: int = Field(..., description="The internal database ID.")
+    
     model_config = ConfigDict(from_attributes=True)
-
 
 class FilmBase(BaseModel):
-    title: str = Field(..., description="Film title")
-    episode_id: int = Field(..., description="Saga episode number")
-    release_date: Optional[str] = Field(None, description="ISO release date, e.g. '1977-05-25'")
-    director: Optional[str] = Field(None, description="Film director")
-    swapi_id: int = Field(..., description="Numeric id of this resource on SWAPI, extracted from its URL")
-    swapi_url: str = Field(..., description="Canonical SWAPI URL this record was synced from")
-
+    title: str = Field(..., description="The title of the film.")
+    episode_id: int = Field(..., description="The episode number of the film.")
+    release_date: Optional[str] = Field(None, description="The release date of the film.")
+    director: Optional[str] = Field(None, description="The director of the film.")
+    swapi_id: int = Field(..., description="The original ID of the film from SWAPI.")
+    swapi_url: str = Field(..., description="The original URL of the film from SWAPI.")
 
 class FilmResponse(FilmBase):
-    id: int = Field(..., description="Local database id — use this for votes and lookups against this API")
-
+    """Response model for a Star Wars film."""
+    id: int = Field(..., description="The internal database ID.")
+    
     model_config = ConfigDict(from_attributes=True)
-
 
 class StarshipBase(BaseModel):
-    name: str = Field(..., description="Starship name")
-    model: Optional[str] = Field(None, description="Manufacturer's model designation")
-    manufacturer: Optional[str] = Field(None, description="Manufacturer name")
-    swapi_id: int = Field(..., description="Numeric id of this resource on SWAPI, extracted from its URL")
-    swapi_url: str = Field(..., description="Canonical SWAPI URL this record was synced from")
-
+    name: str = Field(..., description="The name of the starship.")
+    model: Optional[str] = Field(None, description="The model of the starship.")
+    manufacturer: Optional[str] = Field(None, description="The manufacturer of the starship.")
+    swapi_id: int = Field(..., description="The original ID of the starship from SWAPI.")
+    swapi_url: str = Field(..., description="The original URL of the starship from SWAPI.")
 
 class StarshipResponse(StarshipBase):
-    id: int = Field(..., description="Local database id — use this for votes and lookups against this API")
-
+    """Response model for a Star Wars starship."""
+    id: int = Field(..., description="The internal database ID.")
+    
     model_config = ConfigDict(from_attributes=True)
-
-
-class PaginatedCharacters(BaseModel):
-    count: int = Field(..., description="Total number of characters in the database (not just this page)")
-    results: List[CharacterResponse]
-
-
-class PaginatedFilms(BaseModel):
-    count: int = Field(..., description="Total number of films in the database (not just this page)")
-    results: List[FilmResponse]
-
-
-class PaginatedStarships(BaseModel):
-    count: int = Field(..., description="Total number of starships in the database (not just this page)")
-    results: List[StarshipResponse]
-
-
-class SyncResult(BaseModel):
-    resource_type: str = Field(..., description="Which resource type this sync run covered")
-    synced: int = Field(..., description="Total records fetched from SWAPI for this run")
-    created: int = Field(..., description="Records that were new and got inserted")
-    updated: int = Field(..., description="Records that already existed and got updated in place")

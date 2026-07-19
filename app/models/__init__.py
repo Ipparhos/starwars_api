@@ -1,3 +1,4 @@
+from app.database import Base
 from app.models.associations import character_films, character_starships
 from app.models.character import Character
 from app.models.film import Film
