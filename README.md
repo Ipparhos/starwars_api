@@ -1,5 +1,7 @@
 # Star Wars API
 
+![CI](https://github.com/Ipparhos/starwars_api/actions/workflows/ci.yml/badge.svg)
+
 A RESTful API that syncs Star Wars characters, films, and starships from
 [SWAPI](https://swapi.dev/) into a local Postgres database, serves them back
 with pagination, and lets you vote for your favorites.
@@ -179,18 +181,18 @@ app/models/film.py                14      0   100%
 app/models/starship.py            13      0   100%
 app/models/vote.py                 9      0   100%
 app/routers/__init__.py            0      0   100%
-app/routers/characters.py         23      5    78%   16, 24, 30-32
-app/routers/films.py              23      5    78%   16, 23, 29-31
-app/routers/starships.py          23      5    78%   16, 23, 29-31
-app/routers/sync.py               30      4    87%   21, 29, 37, 45
-app/routers/votes.py              32      6    81%   28, 44, 46, 54, 63-65
+app/routers/characters.py         23      0   100%
+app/routers/films.py              23      0   100%
+app/routers/starships.py          23      0   100%
+app/routers/sync.py               30      0   100%
+app/routers/votes.py              32      2    94%   44, 46
 app/schemas/__init__.py            1      0   100%
 app/schemas/schemas.py            45      0   100%
 app/services/__init__.py           2      0   100%
 app/services/swapi_client.py      28      3    89%   28-30
-app/services/sync_service.py      85     38    55%   21, 47, 59-79, 95-113, 136-179, 190-192
+app/services/sync_service.py      85      2    98%   21, 47
 ------------------------------------------------------------
-TOTAL                            395     71    82%
+TOTAL                            395     12    97%
 ```
 
 ## Known Limitations / Roadmap
