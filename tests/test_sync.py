@@ -67,8 +67,9 @@ async def test_sync_success(async_client: AsyncClient):
     
     # Verify the results in the database
     chars = await async_client.get("/api/characters")
-    assert len(chars.json()) == 1
-    assert chars.json()[0]["name"] == "Luke Skywalker"
+    data = chars.json()["data"]
+    assert len(data) == 1
+    assert data[0]["name"] == "Luke Skywalker"
 
 @respx.mock
 async def test_sync_swapi_down(async_client: AsyncClient):
@@ -194,13 +195,13 @@ async def test_sync_idempotency_and_individual_endpoints(async_client: AsyncClie
     
     # 4. Verify no duplicates and data is updated
     chars = await async_client.get("/api/characters")
-    assert len(chars.json()) == 1
-    assert chars.json()[0]["mass"] == "80"
+    assert len(chars.json()["data"]) == 1
+    assert chars.json()["data"][0]["mass"] == "80"
     
     films = await async_client.get("/api/films")
-    assert len(films.json()) == 1
-    assert films.json()[0]["title"] == "A New Hope - Special Edition"
+    assert len(films.json()["data"]) == 1
+    assert films.json()["data"][0]["title"] == "A New Hope - Special Edition"
     
     ships = await async_client.get("/api/starships")
-    assert len(ships.json()) == 1
-    assert ships.json()[0]["name"] == "X-wing Fighter"
+    assert len(ships.json()["data"]) == 1
+    assert ships.json()["data"][0]["name"] == "X-wing Fighter"

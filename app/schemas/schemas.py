@@ -1,6 +1,13 @@
 from pydantic import BaseModel, ConfigDict, Field
-from typing import List, Optional
+from typing import List, Optional, Generic, TypeVar
 from datetime import datetime
+
+T = TypeVar("T")
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    data: List[T]
+    skip: int
+    limit: int
 
 class VoteCreate(BaseModel):
     """Payload to cast a vote for a specific resource."""

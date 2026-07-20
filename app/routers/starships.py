@@ -7,32 +7,34 @@ from fastapi_cache.decorator import cache
 
 from app.database import get_db
 from app.models import Starship
-from app.schemas.schemas import StarshipResponse
+from app.schemas.schemas import StarshipResponse, PaginatedResponse
 
 router = APIRouter(prefix="/starships", tags=["Starships"])
 
-@router.get("", response_model=List[StarshipResponse])
+@router.get("", response_model=PaginatedResponse[StarshipResponse])
 @cache(expire=60)
 async def get_starships(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
     """Retrieve starships with pagination."""
     query = select(Starship).options(selectinload(Starship.pilots)).offset(skip).limit(limit)
     result = await db.scalars(query)
-    return result.unique().all()
+    data = [StarshipResponse.model_validate(s) for s in result.unique().all()]
+    return {"data": data, "skip": skip, "limit": limit}
 
 @router.get("/search", response_model=List[StarshipResponse])
 @cache(expire=60)
 async def search_starships(name: str, db: AsyncSession = Depends(get_db)):
     """Search starships by name (case-insensitive partial match)."""
-    query = select(Starship).options(selectinload(Starship.pilots)).where(func.lower(Starship.name).like(f"%{name.lower()}%"))
+    name_escaped = name.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    query = select(Starship).options(selectinload(Starship.pilots)).where(func.lower(Starship.name).like(f"%{name_escaped}%", escape="\\"))
     result = await db.scalars(query)
-    return result.unique().all()
+    return [StarshipResponse.model_validate(s) for s in result.unique().all()]
 
 @router.get("/{starship_id}", response_model=StarshipResponse)
 @cache(expire=60)
 async def get_starship(starship_id: int, db: AsyncSession = Depends(get_db)):
     """Retrieve a specific starship by ID."""
     query = select(Starship).options(selectinload(Starship.pilots)).where(Starship.id == starship_id)
-    starship = await db.scalar(query)
-    if not starship:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Starship not found")
-    return starship
+    ship = await db.scalar(query)
+    if not ship:
+        raise HTTPException(status_code=404, detail=f"Starship with ID {starship_id} not found")
+    return StarshipResponse.model_validate(ship)

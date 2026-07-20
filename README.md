@@ -192,18 +192,18 @@ app/models/film.py                14      0   100%
 app/models/starship.py            13      0   100%
 app/models/vote.py                 9      0   100%
 app/routers/__init__.py            0      0   100%
-app/routers/characters.py         27      0   100%
-app/routers/films.py              27      0   100%
-app/routers/starships.py          27      0   100%
-app/routers/sync.py               33      0   100%
-app/routers/votes.py              34      2    94%   46, 48
+app/routers/characters.py         32      0   100%
+app/routers/films.py              32      0   100%
+app/routers/starships.py          32      0   100%
+app/routers/sync.py               56      2    96%   68, 70
+app/routers/votes.py              44      8    82%   34-39, 58, 60
 app/schemas/__init__.py            1      0   100%
-app/schemas/schemas.py            45      0   100%
+app/schemas/schemas.py            67      0   100%
 app/services/__init__.py           2      0   100%
 app/services/swapi_client.py      28      3    89%   28-30
 app/services/sync_service.py      85      2    98%   21, 47
 ------------------------------------------------------------
-TOTAL                            423     16    96%
+TOTAL                            493     24    95%
 ```
 
 ## Known Limitations / Roadmap
@@ -212,3 +212,5 @@ TOTAL                            423     16    96%
   network access can trigger a sync or vote. Acceptable for a take-home
   assessment scope, but would need an API key or JWT on mutating
   endpoints before this went anywhere near production.
+- **Sync Status**: The API uses a Redis-backed cache to keep track of asynchronous background job completion statuses without the need for a heavy message broker framework.
+- **Race Conditions in Sync**: While the `POST /api/sync` endpoints are protected at the app level by a global `IntegrityError` handler that prevents crashing during concurrent UPSERT conflicts on the `swapi_id` unique constraint, true concurrent UPSERT resilience in Postgres would utilize `sqlalchemy.dialects.postgresql.insert(Table).on_conflict_do_update()`. The current ORM `db.scalar(...) / db.add(...)` approach is sufficient for the scope of the assessment but could be hardened further in production.
