@@ -39,8 +39,7 @@ avoid that becoming this API's problem too:
 - Fetched data is persisted in the local DB rather than re-fetched on every
   read, so reads work fine even if SWAPI is down at the time.
 
-**Voting** — The brief mentions voting once, without specifying its shape
-(a counter? a table? per-user?). I implemented it as a separate `Vote`
+**Voting** — I implemented it as a separate `Vote`
 table (`resource_type`, `resource_id`, `created_at`) rather than a bare
 counter column, so there's an audit trail and room to build a "most
 voted" leaderboard later, at the cost of a `COUNT()` query instead of a
@@ -70,7 +69,7 @@ requirements.txt
 ## Prerequisites
 
 - Docker + Docker Compose (recommended), **or**
-- Python 3.12 and a local Postgres instance
+- Python 3.12.13 and a local Postgres instance
 
 ## Setup & Run
 

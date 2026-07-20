@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
+from fastapi.openapi.docs import get_redoc_html
 from sqlalchemy.exc import IntegrityError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.services.swapi_client import SWAPIUnavailableError
 from app.routers import sync, characters, films, starships, votes
 
@@ -20,8 +22,17 @@ app = FastAPI(
     title="Star Wars API",
     description="RESTful API for Star Wars characters, films, and starships.",
     version="1.0.0",
+    redoc_url=None,  # We will define a custom route to fix CDN issues
     lifespan=lifespan,
 )
+
+@app.get("/redoc", include_in_schema=False)
+async def redoc_html():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - ReDoc",
+        redoc_js_url="https://unpkg.com/redoc@2.1.4/bundles/redoc.standalone.js",
+    )
 
 # Exception Handlers
 @app.exception_handler(SWAPIUnavailableError)
@@ -36,6 +47,13 @@ async def sqlalchemy_integrity_exception_handler(request: Request, exc: Integrit
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
         content={"detail": "A database integrity error occurred (e.g., duplicate record)."},
+    )
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
     )
 
 @app.exception_handler(Exception)
