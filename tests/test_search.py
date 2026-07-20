@@ -90,3 +90,31 @@ async def test_get_resource_by_id(async_client: AsyncClient, db_session: AsyncSe
     
     resp_ship_404 = await async_client.get("/api/starships/9999")
     assert resp_ship_404.status_code == 404
+
+async def test_pagination_edge_cases(async_client: AsyncClient):
+    """Test pagination bounds for negative skip/limit and overflow values."""
+    # Negative limit should return 422 Unprocessable Entity
+    resp_neg_limit = await async_client.get("/api/characters?limit=-5")
+    assert resp_neg_limit.status_code == 422
+    
+    # Negative skip should return 422
+    resp_neg_skip = await async_client.get("/api/characters?skip=-1")
+    assert resp_neg_skip.status_code == 422
+    
+    # Exceeding max limit (e.g., > 100) should return 422
+    resp_huge_limit = await async_client.get("/api/characters?limit=200")
+    assert resp_huge_limit.status_code == 422
+
+async def test_wildcard_search_edge_cases(async_client: AsyncClient, db_session: AsyncSession):
+    """Test that % and _ characters are properly escaped in searches."""
+    # Insert a dummy character with a literal % in their name
+    char = Character(swapi_id=999, swapi_url="http://fake", name="100% Cotton Skywalker")
+    db_session.add(char)
+    await db_session.commit()
+    
+    # Searching for just '%' should not return 'Luke Skywalker' or 'Darth Vader'
+    resp = await async_client.get("/api/characters/search?name=%")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 1
+    assert data[0]["name"] == "100% Cotton Skywalker"

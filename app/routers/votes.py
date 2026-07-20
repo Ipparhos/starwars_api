@@ -51,7 +51,6 @@ async def cast_vote(vote_in: VoteCreate, db: AsyncSession = Depends(get_db)):
     
     resource_type = vote_in.resource_type.lower()
     
-    # Validate resource type and existence
     if resource_type == "character":
         resource = await db.get(Character, vote_in.resource_id)
     elif resource_type == "film":
@@ -70,7 +69,6 @@ async def cast_vote(vote_in: VoteCreate, db: AsyncSession = Depends(get_db)):
             detail=f"{resource_type.capitalize()} with ID {vote_in.resource_id} not found."
         )
 
-    # Record the vote
     new_vote = Vote(resource_type=resource_type, resource_id=vote_in.resource_id)
     db.add(new_vote)
     await db.commit()

@@ -34,7 +34,6 @@ async def redoc_html():
         redoc_js_url="https://unpkg.com/redoc@2.1.4/bundles/redoc.standalone.js",
     )
 
-# Exception Handlers
 @app.exception_handler(SWAPIUnavailableError)
 async def swapi_unavailable_exception_handler(request: Request, exc: SWAPIUnavailableError):
     return JSONResponse(
@@ -58,7 +57,6 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    # Log the full stack trace internally here
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"detail": "An unexpected internal server error occurred."},

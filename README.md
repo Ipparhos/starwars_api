@@ -183,7 +183,7 @@ Name                           Stmts   Miss  Cover   Missing
 app/__init__.py                    0      0   100%
 app/config.py                     11      0   100%
 app/database.py                    9      2    78%   19-20
-app/main.py                       33      7    79%   15-17, 29, 36, 44, 51
+app/main.py                       41      8    80%   17-19, 31, 39, 46, 60, 67
 app/models/__init__.py             6      0   100%
 app/models/associations.py         4      0   100%
 app/models/character.py           15      0   100%
@@ -191,18 +191,18 @@ app/models/film.py                14      0   100%
 app/models/starship.py            13      0   100%
 app/models/vote.py                 9      0   100%
 app/routers/__init__.py            0      0   100%
-app/routers/characters.py         32      0   100%
-app/routers/films.py              32      0   100%
-app/routers/starships.py          32      0   100%
+app/routers/characters.py         33      0   100%
+app/routers/films.py              33      0   100%
+app/routers/starships.py          33      0   100%
 app/routers/sync.py               56      2    96%   68, 70
-app/routers/votes.py              44      8    82%   34-39, 58, 60
+app/routers/votes.py              44      8    82%   34-39, 57, 59
 app/schemas/__init__.py            1      0   100%
 app/schemas/schemas.py            67      0   100%
 app/services/__init__.py           2      0   100%
 app/services/swapi_client.py      28      3    89%   28-30
 app/services/sync_service.py      85      2    98%   21, 47
 ------------------------------------------------------------
-TOTAL                            493     24    95%
+TOTAL                            504     25    95%
 ```
 
 ## Known Limitations / Roadmap

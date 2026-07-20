@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from typing import List
+from fastapi import Query
 from fastapi_cache.decorator import cache
 
 from app.database import get_db
@@ -13,7 +14,11 @@ router = APIRouter(prefix="/films", tags=["Films"])
 
 @router.get("", response_model=PaginatedResponse[FilmResponse])
 @cache(expire=60)
-async def get_films(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
+async def get_films(
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(10, ge=1, le=100, description="Max number of records to return"),
+    db: AsyncSession = Depends(get_db)
+):
     """Retrieve films with pagination."""
     query = select(Film).options(selectinload(Film.characters)).offset(skip).limit(limit)
     result = await db.scalars(query)
