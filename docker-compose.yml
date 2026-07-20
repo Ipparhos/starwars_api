@@ -11,9 +11,12 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/starwars
       - SWAPI_BASE_URL=https://swapi.dev/api
+      - REDIS_URL=redis://redis:6379
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   db:
     image: postgres:17-alpine
@@ -30,6 +33,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:

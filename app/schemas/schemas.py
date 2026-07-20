@@ -21,6 +21,7 @@ class VoteCount(BaseModel):
     resource_type: str = Field(..., description="The type of resource.")
     resource_id: int = Field(..., description="The internal database ID of the resource.")
     count: int = Field(..., description="The total number of votes for this resource.")
+    resource_name: Optional[str] = Field(None, description="The name/title of the resource voted for.")
 
 class CharacterBase(BaseModel):
     name: str = Field(..., description="The name of the character.")
@@ -30,9 +31,26 @@ class CharacterBase(BaseModel):
     swapi_id: int = Field(..., description="The original ID of the character from SWAPI.")
     swapi_url: str = Field(..., description="The original URL of the character from SWAPI.")
 
+class FilmSummary(BaseModel):
+    id: int
+    title: str
+    model_config = ConfigDict(from_attributes=True)
+
+class StarshipSummary(BaseModel):
+    id: int
+    name: str
+    model_config = ConfigDict(from_attributes=True)
+
+class CharacterSummary(BaseModel):
+    id: int
+    name: str
+    model_config = ConfigDict(from_attributes=True)
+
 class CharacterResponse(CharacterBase):
     """Response model for a Star Wars character."""
     id: int = Field(..., description="The internal database ID.")
+    films: List[FilmSummary] = []
+    starships: List[StarshipSummary] = []
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -47,6 +65,7 @@ class FilmBase(BaseModel):
 class FilmResponse(FilmBase):
     """Response model for a Star Wars film."""
     id: int = Field(..., description="The internal database ID.")
+    characters: List[CharacterSummary] = []
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -60,5 +79,6 @@ class StarshipBase(BaseModel):
 class StarshipResponse(StarshipBase):
     """Response model for a Star Wars starship."""
     id: int = Field(..., description="The internal database ID.")
+    pilots: List[CharacterSummary] = []
     
     model_config = ConfigDict(from_attributes=True)

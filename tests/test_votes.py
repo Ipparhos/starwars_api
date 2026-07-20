@@ -69,6 +69,7 @@ async def test_get_vote_count(async_client: AsyncClient, db_session: AsyncSessio
     assert data["resource_type"] == "character"
     assert data["resource_id"] == char.id
     assert data["count"] == 2
+    assert data["resource_name"] == "Luke Skywalker"
     
     # Invalid type
     resp_invalid = await async_client.get(f"/api/votes/planet/{char.id}")

@@ -155,7 +155,17 @@ field-level descriptions, is at `/docs` once the app is running.
 | 503 | SWAPI unreachable after retries |
 | 500 | Anything unexpected — caught by a global handler so no stack trace leaks to the client |
 
-## Testing
+## Architecture Notes
+
+### Caching with Redis
+To ensure high read-performance for listing and searching resources, we have integrated **Redis**. All `GET` endpoints (characters, films, starships, and vote counts) utilize `@cache` decorators from `fastapi-cache2`. This ensures immediate, highly concurrent responses under heavy traffic.
+
+### Asynchronous Task Processing
+The `POST /api/sync` endpoint fetches and merges a significant amount of data from SWAPI. Instead of blocking the HTTP request, the sync operation is offloaded to a background worker, and the endpoint immediately returns `202 Accepted`. 
+
+*Note: For the sake of simplicity and ease of local testing in this assessment, we are utilizing FastAPI's native `BackgroundTasks`. In a full production environment, this workload would be pushed to a dedicated message broker (like **RabbitMQ** or **Redis**) and processed by async task workers (like **Celery**).*
+
+## Testing & Coverage
 
 **Status: Fully implemented!**
 
@@ -166,14 +176,15 @@ Coverage includes:
 - `GET` pagination and case-insensitive search queries
 - `POST /api/votes` with proper 404 and validation error paths
 
-**Current Coverage: 82%**
+**Current Coverage:**
 ```text
+---------- coverage: platform linux, python 3.12.13-final-0 ----------
 Name                           Stmts   Miss  Cover   Missing
 ------------------------------------------------------------
 app/__init__.py                    0      0   100%
-app/config.py                     10      0   100%
+app/config.py                     11      0   100%
 app/database.py                    9      2    78%   19-20
-app/main.py                       23      3    87%   23, 31, 38
+app/main.py                       33      7    79%   15-17, 29, 36, 44, 51
 app/models/__init__.py             6      0   100%
 app/models/associations.py         4      0   100%
 app/models/character.py           15      0   100%
@@ -181,18 +192,18 @@ app/models/film.py                14      0   100%
 app/models/starship.py            13      0   100%
 app/models/vote.py                 9      0   100%
 app/routers/__init__.py            0      0   100%
-app/routers/characters.py         23      0   100%
-app/routers/films.py              23      0   100%
-app/routers/starships.py          23      0   100%
-app/routers/sync.py               30      0   100%
-app/routers/votes.py              32      2    94%   44, 46
+app/routers/characters.py         27      0   100%
+app/routers/films.py              27      0   100%
+app/routers/starships.py          27      0   100%
+app/routers/sync.py               33      0   100%
+app/routers/votes.py              34      2    94%   46, 48
 app/schemas/__init__.py            1      0   100%
 app/schemas/schemas.py            45      0   100%
 app/services/__init__.py           2      0   100%
 app/services/swapi_client.py      28      3    89%   28-30
 app/services/sync_service.py      85      2    98%   21, 47
 ------------------------------------------------------------
-TOTAL                            395     12    97%
+TOTAL                            423     16    96%
 ```
 
 ## Known Limitations / Roadmap

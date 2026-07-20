@@ -4,10 +4,23 @@ from sqlalchemy.exc import IntegrityError
 from app.services.swapi_client import SWAPIUnavailableError
 from app.routers import sync, characters, films, starships, votes
 
+from contextlib import asynccontextmanager
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
+from app.config import settings
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    redis = aioredis.from_url(settings.REDIS_URL, encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    yield
+
 app = FastAPI(
     title="Star Wars API",
     description="RESTful API for Star Wars characters, films, and starships.",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Exception Handlers

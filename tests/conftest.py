@@ -15,6 +15,16 @@ engine = create_async_engine(
 )
 TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession, expire_on_commit=False)
 
+import app.database as app_db
+app_db.AsyncSessionLocal = TestingSessionLocal
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
+
+@pytest.fixture(autouse=True)
+def setup_cache():
+    """Initialize FastAPICache with an in-memory backend for tests."""
+    FastAPICache.init(InMemoryBackend(), prefix="test-cache")
 
 @pytest_asyncio.fixture(scope="function")
 async def db_session():
